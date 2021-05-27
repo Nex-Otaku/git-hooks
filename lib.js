@@ -1,21 +1,15 @@
-const exec = require('child-process-promise').exec;
-
-const _ = require('lodash');
-
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
 module.exports = {
     shellRun: async (command) => {
-        return exec(command)
-            .then(function (result) {
-                var stderr = result.stderr;
-
-                if (stderr.length > 0) {
-                    throw new Error(stderr);
-                }
-
-                return result.stdout;
-            })
-            .catch(function (err) {
-                console.error('ERROR: ', err);
-            });
+        try {
+         const {stdout,stderr} = await exec(command);
+            if (stderr.length > 0) {
+                console.error('Execution error: ',stderr);
+            }
+            return stdout;
+        }catch(e) {
+            console.error('Error:', e);
+        }
     },
 };
